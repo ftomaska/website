@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Draw a Word</title>
+</head>
+<body>
+    <input type="text" id="username" placeholder="Enter your name">
+    <input type="text" id="word" placeholder="Enter the word to draw">
+    <canvas id="drawingCanvas" width="400" height="200" style="border:1px solid #000;"></canvas>
+    <button onclick="saveDrawing()">Save Drawing</button>
+
+    <script>
+        const canvas = document.getElementById('drawingCanvas');
+        const ctx = canvas.getContext('2d');
+        let drawing = false;
+
+        canvas.addEventListener('mousedown', startDrawing);
+        canvas.addEventListener('mouseup', stopDrawing);
+        canvas.addEventListener('mousemove', draw);
+
+        function startDrawing() {
+            drawing = true;
+            ctx.beginPath();
+        }
+
+        function stopDrawing() {
+            drawing = false;
+            ctx.closePath();
+        }
+
+        function draw(event) {
+            if (!drawing) return;
+            ctx.lineWidth = 2;
+            ctx.lineCap = 'round';
+            ctx.strokeStyle = 'black';
+
+            ctx.lineTo(event.clientX - canvas.offsetLeft, event.clientY - canvas.offsetTop);
+            ctx.stroke();
+        }
+
+        function saveDrawing() {
+            const username = document.getElementById('username').value;
+            const word = document.getElementById('word').value;
+            const timestamp = new Date().toISOString();
+
+            if (username && word) {
+                const dataURL = canvas.toDataURL();
+                console.log({ username, word, timestamp, drawing: dataURL });
+                alert('Drawing saved!');
+                // Send data to server or save locally
+            } else {
+                alert('Please enter both your name and the word!');
+            }
+        }
+    </script>
+</body>
+</html>
