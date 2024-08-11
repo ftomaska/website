@@ -11,9 +11,10 @@
     <canvas id="drawingCanvas" width="400" height="200" style="border:1px solid #000;"></canvas>
     <button onclick="saveDrawing()">Save Drawing</button>
 
-    <!-- Firebase SDK and JavaScript Code -->
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database.js"></script>
+    <!-- Firebase SDK v8.x -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    
     <script>
         // Your web app's Firebase configuration
         const firebaseConfig = {
@@ -27,7 +28,7 @@
         };
 
         // Initialize Firebase
-        const app = firebase.initializeApp(firebaseConfig);
+        firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
         function saveDrawing() {
