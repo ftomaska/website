@@ -6,10 +6,18 @@
     <title>Draw a Word</title>
 </head>
 <body>
+    <h1>Draw a Word and Add a Note</h1>
+
     <input type="text" id="username" placeholder="Enter your name">
     <input type="text" id="word" placeholder="Enter the word to draw">
+    <textarea id="note" placeholder="Enter additional notes here..." rows="4" cols="50"></textarea>
+    <br>
     <canvas id="drawingCanvas" width="400" height="200" style="border:1px solid #000;"></canvas>
+    <br>
     <button onclick="saveDrawing()">Save Drawing</button>
+
+    <h2>Saved Drawings:</h2>
+    <div id="savedDrawings"></div>
 
     <!-- Firebase SDK v8.x -->
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
@@ -35,6 +43,7 @@
         function saveDrawing() {
             const username = document.getElementById('username').value;
             const word = document.getElementById('word').value;
+            const note = document.getElementById('note').value;
             const timestamp = new Date().toISOString();
 
             if (username && word) {
@@ -43,18 +52,50 @@
                 const drawingData = {
                     username: username,
                     word: word,
+                    note: note,  // Add the note to the drawing data
                     timestamp: timestamp,
                     drawing: dataURL
                 };
 
                 const drawingsRef = database.ref('drawings');
                 drawingsRef.push(drawingData)
-                    .then(() => alert('Drawing saved to Firebase!'))
+                    .then(() => {
+                        alert('Drawing and note saved to Firebase!');
+                        fetchDrawings(); // Fetch drawings after saving a new one
+                    })
                     .catch(error => alert('Error saving drawing: ' + error.message));
             } else {
                 alert('Please enter both your name and the word!');
             }
         }
+
+        // Function to fetch and display drawings
+        function fetchDrawings() {
+            const drawingsRef = database.ref('drawings');
+            drawingsRef.once('value', (snapshot) => {
+                const drawingsContainer = document.getElementById('savedDrawings');
+                drawingsContainer.innerHTML = ''; // Clear previous drawings
+                
+                snapshot.forEach((childSnapshot) => {
+                    const drawing = childSnapshot.val();
+                    const img = document.createElement('img');
+                    img.src = drawing.drawing;
+                    img.alt = `${drawing.username} - ${drawing.word}`;
+                    img.width = 200;
+                    
+                    const textDiv = document.createElement('div');
+                    textDiv.textContent = `User: ${drawing.username}, Word: ${drawing.word}, Note: ${drawing.note}`;
+                    
+                    const drawingContainer = document.createElement('div');
+                    drawingContainer.appendChild(img);
+                    drawingContainer.appendChild(textDiv);
+                    drawingsContainer.appendChild(drawingContainer);
+                });
+            });
+        }
+
+        // Fetch drawings when the page loads
+        window.onload = fetchDrawings;
 
         // Canvas drawing functionality
         const canvas = document.getElementById('drawingCanvas');
